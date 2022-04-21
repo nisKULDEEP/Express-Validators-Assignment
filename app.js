@@ -17,8 +17,10 @@ app.post(
   body("pincode")
     .isLength({ min: 6, max: 6 })
     .withMessage("pincode is compulsory"),
-  body("gender").isLength({ min: 3 }).withMessage("gender is compulsory"),
-  body("age").isLength({ min: 1 }).withMessage("age is compulsory"),
+  body("gender")
+    .isIn(["male", "female", "other"])
+    .withMessage("gender must be male or female or other"),
+  body("age").isInt({ min: 1, max: 100 }).withMessage("age is compulsory"),
   async (req, res, next) => {
     try {
       const error = validationResult(req);
@@ -27,6 +29,7 @@ app.post(
           status: "validation error",
           data: error,
         });
+        return;
       }
       const data = await User.insertMany(req.body);
       res.status(200).json({
